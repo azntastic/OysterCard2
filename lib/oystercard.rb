@@ -21,7 +21,8 @@ attr_reader :balance, :entry_station, :exit_station, :journey_history, :journey
 
   def touch_in(station)
     check_balance
-    journey = Journey.new(station)
+    @entry_station = station
+    @journey = Journey.new(station)
     # journey.save_entry_station(station)
     #above doesnt work because we're trying to pass in a different object. Journey and journey in our test are both different
     # @entry_station = station
@@ -31,6 +32,7 @@ attr_reader :balance, :entry_station, :exit_station, :journey_history, :journey
 
   def touch_out(station)
     deduct(MIN_FARE)
+    @journey.recieve_exit_info(station)
     @exit_station = station
     @journey_history << {
       :entry_station => @entry_station,

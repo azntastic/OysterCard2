@@ -1,11 +1,12 @@
 class Journey
-attr_accessor :entry_station, :save_entry_station
+attr_accessor :entry_station, :exit_station
 
   def initialize(station)
     @entry_station = station
   end
 
-  def save_entry_station(station)
-    @entry_station = station
+  def recieve_exit_info(station)
+    @exit_station = station
   end
+
 end

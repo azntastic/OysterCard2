@@ -61,6 +61,7 @@ describe Oystercard do
       context "when balance is below the minimum" do
 
         it "returns an error when balance is less than the minimum" do
+          card.touch_in(entry_station)
           card.touch_out(exit_station)
           error = "The minimum balance needed for your journey is £#{Oystercard::MIN}"
           expect{card.touch_in(card)}.to raise_error error
@@ -71,10 +72,12 @@ describe Oystercard do
     describe "#touch_out" do
       end
       it "reduces the balance by the minimum fare" do
+        card.touch_in(entry_station) #Before block (?)
         expect{card.touch_out(exit_station)}.to change{card.balance}.by(-Oystercard::MIN_FARE)
       end
 
       it "sets exit_station" do
+        card.touch_in(entry_station)
         card.touch_out(exit_station)
         expect(card.exit_station).to eq exit_station
       end

@@ -12,6 +12,7 @@ class JourneyLog
   def finish(station)
     @current_journey ||= Journey.new(nil)
     @current_journey.recieve_exit_info(station)
+    @logs << @current_journey
   end
 
 end

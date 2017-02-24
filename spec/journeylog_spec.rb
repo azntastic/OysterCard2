@@ -23,4 +23,10 @@ describe JourneyLog do
     expect(journeylog.current_journey.exit_station).to eq station
   end
 
+  it "stores journeys" do
+    journeylog.start(station)
+    journeylog.finish(station)
+    expect(journeylog.logs).to_not be_empty
+  end
+
 end

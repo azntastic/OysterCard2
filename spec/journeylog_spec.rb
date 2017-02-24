@@ -23,8 +23,18 @@ describe JourneyLog do
     expect(journeylog.current_journey.exit_station).to eq station
   end
 
-  it "stores journeys" do
+  it "stores a complete journeys" do
     journeylog.start(station)
+    journeylog.finish(station)
+    expect(journeylog.logs).to_not be_empty
+  end
+
+  it "stores incomplete journey - 1" do
+    journeylog.start(station)
+    expect(journeylog.logs).to_not be_empty
+  end
+
+  it "stores incomplete journey - 2" do
     journeylog.finish(station)
     expect(journeylog.logs).to_not be_empty
   end

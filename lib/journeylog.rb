@@ -7,12 +7,13 @@ class JourneyLog
 
   def start(station)
     @current_journey = Journey.new(station)
+    logs << @current_journey
   end
 
   def finish(station)
     @current_journey ||= Journey.new(nil)
     @current_journey.recieve_exit_info(station)
-    @logs << @current_journey
+    logs << @current_journey unless logs.include? @current_journey
   end
 
 end

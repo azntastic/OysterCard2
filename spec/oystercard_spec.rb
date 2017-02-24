@@ -6,7 +6,7 @@ describe Oystercard do
   let(:exit_station) {double :exit_station}
 
   before(:each) do
-    card.top_up(3)
+    card.top_up(10)
   end
 
   it "initializes with an empty journey log" do
@@ -19,7 +19,7 @@ describe Oystercard do
     end
 
     it "puts money on card" do
-      expect(card.balance).to eq 3
+      expect(card.balance).to eq 10
     end
   end
 
@@ -53,18 +53,17 @@ describe Oystercard do
         expect(card).to respond_to(:check_balance)
       end
 
-      it "it sets the entry station" do
-        card.touch_in(entry_station)
-        expect(card.entry_station).to eq entry_station
-      end
+      # it "it sets the entry station" do
+      #   card.touch_in(entry_station)
+      #   expect(card.entry_station).to eq entry_station
+      # end
 
       context "when balance is below the minimum" do
 
         it "returns an error when balance is less than the minimum" do
-          card.touch_in(entry_station)
-          card.touch_out(exit_station)
+          card1 = Oystercard.new
           error = "The minimum balance needed for your journey is £#{Oystercard::MIN}"
-          expect{card.touch_in(card)}.to raise_error error
+          expect{card1.touch_in(card)}.to raise_error error
         end
       end
     end
@@ -76,16 +75,25 @@ describe Oystercard do
         expect{card.touch_out(exit_station)}.to change{card.balance}.by(-Oystercard::MIN_FARE)
       end
 
-      it "sets exit_station" do
+      # it "sets exit_station" do
+      #   card.touch_in(entry_station)
+      #   card.touch_out(exit_station)
+      #   expect(card.exit_station).to eq exit_station
+      # end
+
+      it "puts station data into history array" do
         card.touch_in(entry_station)
         card.touch_out(exit_station)
-        expect(card.exit_station).to eq exit_station
+        expect(card.journey_history).to_not be_empty
       end
 
-      it "puts station data hash into history array" do
+      it "should charge penalty fare when i touch out but don't touch in" do
+        expect{card.touch_out(exit_station)}.to change{card.balance}.by -(Journey::PENALTY_FARE)
+      end
+
+      it "should charge penalty fare when i touch in but don't touch out" do
         card.touch_in(entry_station)
-        card.touch_out(exit_station)
-        expect(card.journey_history).to eq [{:entry_station => entry_station, :exit_station => exit_station}]
+        expect{card.touch_in(entry_station)}.to change{card.balance}.by -(Journey::PENALTY_FARE)
       end
 
   end

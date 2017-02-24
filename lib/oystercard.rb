@@ -1,13 +1,12 @@
 require_relative 'journey'
 
 class Oystercard
-attr_reader :balance, :entry_station, :exit_station, :journey_history, :journey
+attr_reader :balance, :journey_history, :journey
 
   def initialize
     @balance = 0
     @journey_history = []
-    @entry_station = nil
-    @exit_station = nil
+    @in_journey = false
   end
 
   LIMIT = 90
@@ -21,28 +20,40 @@ attr_reader :balance, :entry_station, :exit_station, :journey_history, :journey
 
   def touch_in(station)
     check_balance
-    @entry_station = station
-    @journey = Journey.new(station)
+    #checks to see if there are existing journeys, then checks for exit station
+    if journey_history.any? && @journey_history[-1].exit_station == nil
+    # if journey_history.any?
+    #   if @journey_history[-1].exit_station == nil
+        deduct(Journey::PENALTY_FARE)
+    else
+      @journey = Journey.new(station)
+      @journey_history << @journey
+    end
+    #if there's an existing instance of incomplete journey, charge penalty
+
     # journey.save_entry_station(station)
     #above doesnt work because we're trying to pass in a different object. Journey and journey in our test are both different
     # @entry_station = station
 
+
     # @in_transit << card
+    @in_journey = true
   end
 
   def touch_out(station)
-    deduct(MIN_FARE)
+    @journey ||= Journey.new(nil)
+    @journey.entry_station == nil ? deduct(Journey::PENALTY_FARE) : deduct(MIN_FARE)
+    #if no entry_station..deduct penalty fare
     @journey.recieve_exit_info(station)
-    @exit_station = station
-    @journey_history << {
-      :entry_station => @entry_station,
-      :exit_station => @exit_station
-    }
-    @entry_station = nil
+    # @journey_history << {
+    #   :entry_station => @journey.entry_station,
+    #   :exit_station => @journey.exit_station
+    # }
+    @in_journey = false
   end
 
   def in_journey?
-    !!@entry_station
+    @in_journey
   end
 
   def check_balance
